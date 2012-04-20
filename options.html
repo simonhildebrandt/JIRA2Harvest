@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+      var projects = null;
+      
+      function save() {
+        localStorage['user'] = $('#user').val();
+        localStorage['pass'] = $('#pass').val();
+      }
+      function retrieve() {
+        $('#user').val(localStorage['user']);
+        $('#pass').val(localStorage['pass']);
+      }
+    </script>
+    
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      label {
+        display: block;
+        float: left;
+        width: 150px;
+      }
+      input.wide {
+        width: 200px;
+      }
+      #fat-cow {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+      }
+    </style>
+  </head>
+  <body onload="retrieve()">
+    <h1>JIRA2Harvest Settings</h1>
+    <p>
+      <label for="username">Harvest username</label>
+      <input type="text" name="user" id="user" class="wide" />
+    </p>
+    <p>
+      <label for="username">Harvest password</label>
+      <input type="password" name="pass" id="pass" class="wide" />
+    </p>
+    <input type="submit" onclick="save()" value="Save" />
+    <a id="fat-cow" href="http://www.fatcow.com/free-icons">Uses Fat Cow Icons</a>
+  </body>
+</thml>

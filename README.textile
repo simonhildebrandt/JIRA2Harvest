@@ -1,0 +1,14 @@
+h1. JIRA2Harvest
+
+An extension for starting Harvest timers straight from your JIRA tickets.
+
+h2. Instructions
+
+# Download and install "extension":https://github.com/simonhildebrandt/JIRA2Harvest/raw/master/JIRA2Harvest.crx
+# Set your username and password in the extension options
+# Watch the extension badge (Harvest icon in the corner) update with your current timer.
+# Click badge to see all your timers for the day (or to see the current error, probably caused by mistyped credentials)
+# Switch timers by clicking on them
+# Watch for the 'angry' Harvest icon - you have no timer currently running!
+
+_Developed at "Red Ant":http://redant.com.au, where Harvest makes our lives better. :)_

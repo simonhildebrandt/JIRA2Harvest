@@ -1,0 +1,19 @@
+#harvest-tasks {
+  border: 1px solid gray;
+  border-bottom: none;
+  background-color: white;
+}
+#harvest-tasks ul {
+  list-style: none;
+  margin: 0px;
+}
+#harvest-tasks li {
+  float: none;
+  border-bottom: 1px solid gray;
+  padding: 5px;
+}
+#start-button {
+  background-repeat: no-repeat;
+  background-position: 4px 3px;
+  padding-left: 23px;
+}

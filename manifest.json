@@ -1,0 +1,12 @@
+{
+  "name": "JIRA2Harvest",
+  "version": "1.0",
+  "description": "Update Harvest timers from JIRA tickets.",
+  "background_page": "background.html",
+  "options_page": "options.html",
+  "permissions": [
+    "https://*.harvestapp.com/",
+    "http://*.jira.com/",
+    "tabs"
+  ]
+}

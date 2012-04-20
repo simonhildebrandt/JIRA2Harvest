@@ -1,0 +1,149 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>
+  var daily_data = {};
+  
+  function send_request(path, method, string) {
+    if (!string) string = '';
+    var host = 'https://redant.harvestapp.com';
+    var user = localStorage['user'];
+    var pass = localStorage['pass'];
+    var auth_string = btoa(user+':'+pass);
+    var http = new XMLHttpRequest();
+    http.onreadystatechange = handler;
+    var request = http.open(method, host + path, false);
+    http.setRequestHeader('Accept', 'application/json');
+    http.setRequestHeader('Content-Type', 'application/json');
+    http.setRequestHeader('Authorization', 'Basic ' + auth_string);
+    http.send(string);
+    return true;
+  }
+
+  function request_entries() {
+    send_request('/daily', 'get');
+  }
+  
+  function create_timer(details) {
+    //var date_string = (new Date()).;//Tue, 17 Oct 2006
+    var data = {
+        notes: details[2],
+        hours: ' ',
+        project_id: details[0],
+        task_id: details[1],
+        spent_at: ' '
+    };
+    var string = JSON.stringify(data);
+    send_request('/daily/add', 'post', string);
+  }
+  
+  function handler() {
+    if(this.readyState == this.DONE) {
+      if(this.status == 200) {
+        if (this.responseText) {
+          result = JSON.parse( this.responseText );
+          if (result.day_entries) daily_data = result;
+        }
+      } else {
+        console.log("Not 200: "+this.status);
+        console.log(this.response);
+        daily_data.error = this.response;
+      }
+    } else {
+      //console.log("Not done");
+    }
+  }
+
+  function find_active_entry() {
+    if (daily_data.day_entries) {
+      var result = $.grep(daily_data.day_entries, (function(el, index){
+        return el.timer_started_at;
+      }));
+      return result[0];
+    }
+  }
+
+  function find_matching_entry(text) {
+    if (daily_data.day_entries) {
+      var result = $.grep(daily_data.day_entries, (function(el, index){
+        return el.notes.match(text);
+      }));
+      return result[0];
+    }
+  }
+
+  chrome.extension.onRequest.addListener(
+    function(request, sender, sendResponse) {
+      console.log(request);
+      if (request.update) {
+        sendResponse(update_ticket(sender.tab, request.project));
+      } else if (request.start) {
+        var ticket_details = jira_ticket_url(request.start);
+        var ae = find_matching_entry(ticket_details[1]);
+        console.log(ae);
+        if (ae) {
+          console.log("toggling");
+          send_request('/daily/timer/'+ae.id, 'get');
+          sendResponse(update_ticket(sender.tab, request.project));
+        } else {          
+          for (var i = 0; i < daily_data.projects.length; i++) {
+            var project = daily_data.projects[i];
+            if (project.name == request.project) {
+              for (var j = 0; j < project.tasks.length; j++) {
+                var task = project.tasks[j];
+                if (task.name == request.task_name) {
+                  create_timer([project.id, task.id, ticket_details[1]]);
+                  break;
+                }
+              }
+            }
+          }
+          sendResponse(update_ticket(sender.tab, request.project));
+        }
+      } else {
+        console.log(['confusing request', request]);
+      }
+    }
+  );
+
+  function jira_ticket_url(url) {
+    return url.match(/.*\.jira\.com\/browse\/([A-Z]+-\d+)/);
+  }
+  function tabUpdater(tabId, changeInfo, tab) { //integer tabId, object changeInfo, Tab tab
+    console.log(['tab updated', tabId, changeInfo, tab]);
+    var ticket_details = jira_ticket_url(tab.url);
+    if (changeInfo.status == 'complete' && ticket_details) {
+      console.log("Updating tab for ticket " + ticket_details);
+      chrome.tabs.executeScript(tabId, {file: 'jira_code.js'});
+      chrome.tabs.insertCSS(tabId, {file: 'task.css'});
+    } 
+  }
+  
+  function find_project(name) {
+    if (daily_data.projects) {
+      var result = $.grep(daily_data.projects, (function(el, index){
+        return el.name == name;
+      }));
+      return result[0];
+    }
+  }
+  
+  function update_ticket(tab, project) {
+    var state = {project: find_project(project)};
+    request_entries();
+    console.log(daily_data);
+    if (daily_data.error) {
+      state.error = daily_data.error;
+    } else {
+      var ticket_details = jira_ticket_url(tab.url);
+      var entry = find_matching_entry(ticket_details[1]);
+      if (entry && entry.timer_started_at) {
+        state.buttonText = "Stop timer";
+      } else {
+        state.buttonText = "Start timer";
+      }
+      if (entry) state.current = entry.task;
+    }
+    return {setState: state};
+  }
+  
+  chrome.tabs.onUpdated.addListener(tabUpdater);
+</script>
