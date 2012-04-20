@@ -10,6 +10,6 @@ h2. Instructions
 # Watch the Harvest buttons appear and initialise
 # Start/stop a timer mapped to this JIRA.
 
-Timers are created based on the 'Fix Version' of the ticket, so it's assumed that you always have 
+Timers are created based on the 'Fix Version' of the ticket, so it's assumed that you always have Harvest projects with identical names to JIRA fix versions.
 
 _Developed at "Red Ant":http://redant.com.au, where Harvest and JIRA make our lives better. :)_
