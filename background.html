@@ -130,8 +130,8 @@
     var state = {project: find_project(project)};
     request_entries();
     console.log(daily_data);
-    if (daily_data.error) {
-      state.error = daily_data.error;
+    if (daily_data.error || !state.project) {
+      state.error = daily_data.error || "So, I couldn't find a project using this fix version: '" + project + "'";
     } else {
       var ticket_details = jira_ticket_url(tab.url);
       var entry = find_matching_entry(ticket_details[1]);

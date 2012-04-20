@@ -9,17 +9,17 @@ var start_button = document.getElementById('start-button');
 start_button.style.backgroundImage = 'url(' + chrome.extension.getURL('time.png') + ')';
 start_button.addEventListener('click', function() {
   var task_name = document.getElementById('current-task').innerText;
-  var fix_version = document.getElementById('fixVersions-field').innerText;
+  var fix_version = document.getElementById('fixfor-val').innerText.trim();
   chrome.extension.sendRequest({start: document.location.href, task_name: task_name, project: fix_version}, function(response) {
     update(response);
   });
 });
 document.getElementById('task-selector').addEventListener('click', function() {
-  console.log("displaying tasks");
-  document.getElementById('harvest-tasks').style.display = 'block';
+  var selector = document.getElementById('harvest-tasks')
+  selector.style.display = (selector.style.display == 'block') ? 'none' : 'block';
 });
 
-var fix_version = document.getElementById('fixVersions-field').innerText;
+var fix_version = document.getElementById('fixfor-val').innerText.trim();
 chrome.extension.sendRequest({update: document.location.href, project: fix_version}, function(response) {
   update(response);
 });
@@ -27,13 +27,13 @@ chrome.extension.sendRequest({update: document.location.href, project: fix_versi
 function update(response) {
   document.getElementById('timer_buttons').style.opacity = "1";
   if (response.setState.error) {
-    document.getElementById('timer_buttons').innerHTML = '<a title="'+response.setState.error+'">Error accessing Harvest</a> - check your <a target="_blank" href="'+chrome.extension.getURL('options.html')+'">options</a>.';
+    document.getElementById('timer_buttons').innerHTML = response.setState.error+' - check your <a target="_blank" href="'+chrome.extension.getURL('options.html')+'">options</a>?';
   } else {
     var el = document.getElementById('start-button');
     el.innerText = response.setState.buttonText;
-    var task_list = document.createElement('ul');
+    var task_list = document.createElement('div');
     for (var i=0; i < response.setState.project.tasks.length; i++) {
-      var item = document.createElement('li');
+      var item = document.createElement('a');
       item.innerText = response.setState.project.tasks[i].name;
       item.addEventListener('click', function() {
         document.getElementById('current-task').innerText = this.innerText;

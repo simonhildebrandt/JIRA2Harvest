@@ -3,14 +3,14 @@
   border-bottom: none;
   background-color: white;
 }
-#harvest-tasks ul {
-  list-style: none;
-  margin: 0px;
+#harvest-tasks div {
 }
-#harvest-tasks li {
+#harvest-tasks a {
+  display: block;
   float: none;
   border-bottom: 1px solid gray;
   padding: 5px;
+  text-decoration: none;
 }
 #start-button {
   background-repeat: no-repeat;
